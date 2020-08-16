@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+    volumes:
+      - type: bind
+        source: /home/admin/storage/badger
+        target: /badger
+      - type: bind
+        source: /home/admin/storage/traefik/basic-auth 
+        target: /basic-auth
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"
+    networks:
+      - proxy
+    deploy:
+      labels:
+        #### Labels define the behavior and rules of the traefik proxy for this container ####
+        #### Labels define the behavior and rules of the traefik proxy for this container ####
+        - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+        - traefik.tags=public
+        - traefik.docker.network=proxy
+        - traefik.http.routers.jaeger-secured.entrypoints=web-secured
+        - traefik.http.routers.jaeger-secured.rule=Host(`tracing.aegis.gg`) # <== Setting the domain for the dashboard 
+        
+        - traefik.http.routers.jaeger-secured.tls=true
+        - traefik.http.routers.jaeger-secured.tls.certresolver=mytlschallenge
+        
+        - traefik.http.routers.jaeger-secured.service=jaeger               
+        - traefik.http.services.jaeger.loadbalancer.server.port=16686
+        - traefik.http.routers.jaeger-secured.middlewares=test-auth # basic auth middleware
+        # middleware
+        - traefik.http.middlewares.test-auth.basicauth.usersfile=/basic-auth
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 1
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+networks:
+   proxy:
+     external: true

@@ -1,0 +1,15 @@
+users:
+- name: deployer
+  groups:
+  - docker
+  ssh-authorized-keys:
+  - ${ssh_key}
+
+  sudo: ['ALL=(ALL) NOPASSWD: /usr/bin/docker']
+- name: ${user}
+  groups:
+  - docker
+  ssh-authorized-keys:
+  - ${ssh_key}
+
+  sudo: ['ALL=(ALL) NOPASSWD:ALL']

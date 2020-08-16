@@ -1,0 +1,88 @@
+version: "3.7"
+
+services:
+  ################################################
+  ####        Traefik Proxy Setup           #####
+  ###############################################
+  traefik:
+    image: traefik:v2.2
+    restart: always
+    networks:
+     - proxy
+    ports:
+      - "80:80" # <== http
+      - "8080:8080" # <== :8080 is where the dashboard runs on
+      - "443:443" # <== https
+    command:
+    #### These are the CLI commands that will configure Traefik and tell it how to work! ####
+      ## API Settings - https://docs.traefik.io/operations/api/, endpoints - https://docs.traefik.io/operations/api/#endpoints ##
+      - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+      - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc...
+      - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
+      ## Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO) - https://docs.traefik.io/observability/logs/ ##
+      - --log.level=INFO # <== Setting the level of the logs from traefik
+      ## Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+      - --providers.docker=true # <== Enabling docker as the provider for traefik
+      - --providers.docker.swarmMode=true # <== Enabling docker swarm mode
+      - --providers.docker.swarmModeRefreshSeconds=15s
+      - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik, only expose enabled ones
+      - --providers.docker.watch=true
+      - --providers.docker.constraints=Label(`traefik.tags`,`public`)
+      - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
+      ## Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+      - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
+      - --entrypoints.web-secured.address=:443 # <== Defining an entrypoint for https on port :443 named web-secured
+      ## Certificate Settings (Let's Encrypt) -  https://docs.traefik.io/https/acme/#configuration-examples ##
+      - --certificatesresolvers.mytlschallenge.acme.tlschallenge=true # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+      - --certificatesresolvers.mytlschallenge.acme.email=nanang.ask@gmail.com # <== Setting email for certs
+      - --certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json # <== Defining acme file to store cert information
+    volumes:
+      - type: bind
+        source: /home/admin/storage/traefik/dynamic.yaml # <== Volume for dynamic conf file, **ref: line 27
+        target: /dynamic.yaml
+      - type: bind
+        source: /home/admin/storage/traefik/letsencrypt 
+        target: /letsencrypt
+      - type: bind
+        source: /home/admin/storage/traefik/basic-auth 
+        target: /basic-auth
+      - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
+    deploy:
+      labels:
+          #### Labels define the behavior and rules of the traefik proxy for this container ####
+          - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+          - traefik.tags=public
+          - traefik.docker.network=proxy
+          - traefik.http.routers.traefik.rule=Host(`monitor.aegis.gg`)
+          - traefik.http.routers.traefik.tls=true
+          - traefik.http.routers.traefik.tls.certresolver=mytlschallenge 
+        
+          - traefik.http.routers.traefik.middlewares=test-auth # basic auth middleware
+          - traefik.http.routers.traefik.service=api@internal # <== Enabling the api to be a service to access
+          - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+          # middleware
+          - traefik.http.middlewares.test-auth.basicauth.usersfile=/basic-auth
+
+          - traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)
+          - traefik.http.routers.http_catchall.entrypoints=web
+          - traefik.http.routers.http_catchall.middlewares=https_redirect
+          - traefik.http.middlewares.https_redirect.redirectscheme.scheme=https
+          - traefik.http.middlewares.https_redirect.redirectscheme.permanent=true
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+networks:
+   proxy:
+     external: true

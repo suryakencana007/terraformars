@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+  dbaegis:
+    image: yobasystems/alpine-mariadb
+    restart: always
+    ports:
+      - 33066:3306
+    networks:
+      - proxy
+    volumes:
+      - /home/admin/storage/ghost/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Dur3n@t10n@l
+      MYSQL_PASSWORD: #3S$uIyOXp4i#3wk
+      MYSQL_USER: viking_root
+      MYSQL_DATABASE: aegis_blog
+    deploy:
+      labels:
+        #### Labels define the behavior and rules of the traefik proxy for this container ####
+        - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+        - traefik.tags=public
+        - traefik.docker.network=proxy
+        - traefik.http.routers.dbaegis-secured.entrypoints=web-secured
+        - traefik.http.routers.dbaegis-secured.rule=Host(`blog.db-staging.aegis.gg`)
+        - traefik.http.routers.dbaegis-secured.tls=true
+        - traefik.http.routers.dbaegis-secured.tls.certresolver=mytlschallenge
+
+        - traefik.http.routers.dbaegis-secured.service=dbaegis
+        - traefik.http.services.dbaegis.loadbalancer.server.port=33066
+      placement:
+        constraints:
+            - node.labels.platform == rds
+            - node.role == worker
+networks:
+   proxy:
+     external: true

@@ -1,0 +1,49 @@
+version: '3.7'
+
+services:
+  ghost:
+    image: ghost:2-alpine
+    restart: always
+    ports:
+      - 2368
+    networks:
+      - proxy
+    volumes:
+      - /home/admin/storage/ghost/content:/var/lib/ghost/content
+    environment:
+      url: https://aegis.gg/blog
+      # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
+      database__client: mysql
+      database__connection__host: maria_dbaegis
+      database__connection__user: root
+      database__connection__password: Dur3n@t10n@l
+      database__connection__database: aegis_blog
+      mail__service: Yandex
+      mail__transport: SMTP
+      mail__from: "no-reply <info@aegis.gg>"
+      mail__options__host: smtp.yandex.com
+      mail__options__port: 465
+      mail__options__secureConnection: "true"
+      mail__options__service: SMTP
+      mail__options__auth__user: info@aegis.gg
+      mail__options__auth__pass: jhhzhurqfpyewptq
+    deploy:
+      labels:
+        #### Labels define the behavior and rules of the traefik proxy for this container ####
+        - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+        - traefik.tags=public
+        - traefik.docker.network=proxy
+        - traefik.http.routers.ghost-secured.entrypoints=web-secured
+        - traefik.http.routers.ghost-secured.rule=Host(`aegis.gg`) && PathPrefix(`/blog`)
+        - traefik.http.routers.ghost-secured.tls=true
+        - traefik.http.routers.ghost-secured.tls.certresolver=mytlschallenge
+
+        - traefik.http.routers.ghost-secured.service=ghost
+        - traefik.http.services.ghost.loadbalancer.server.port=2368
+
+      placement:
+        constraints:
+          - node.role == worker
+networks:
+   proxy:
+     external: true

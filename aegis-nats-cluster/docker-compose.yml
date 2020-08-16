@@ -1,0 +1,61 @@
+version: '3.3'
+services:
+  nats-1:
+    image: nats:2.1.4
+    command:
+     - --debug
+     - --cluster
+     - nats://0.0.0.0:6222
+     - --http_port
+     - '8222'
+     - --port
+     - '4222'
+    ports:
+     - 14222:4222
+     - 18222:8222
+    networks:
+     - proxy
+    logging:
+      driver: json-file
+  nats-2:
+    image: nats:2.1.4
+    command:
+     - --debug
+     - --cluster
+     - nats://0.0.0.0:6222
+     - --http_port
+     - '8222'
+     - --port
+     - '4222'
+     - --routes
+     - nats://nats-1:6222
+    ports:
+     - 24222:4222
+     - 28222:8222
+    networks:
+     - proxy
+    logging:
+      driver: json-file
+  nats-3:
+    image: nats:2.1.4
+    command:
+     - --debug
+     - --cluster
+     - nats://0.0.0.0:6222
+     - --http_port
+     - '8222'
+     - --port
+     - '4222'
+     - --routes
+     - nats://nats-1:6222
+    ports:
+     - 34222:4222
+     - 38222:8222
+    networks:
+     - proxy
+    logging:
+      driver: json-file
+
+networks:
+  proxy:
+    external: true

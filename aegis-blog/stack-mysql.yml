@@ -11,10 +11,10 @@ services:
     volumes:
       - /home/admin/storage/ghost/mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: Dur3n@t10n@l
+      MYSQL_ROOT_PASSWORD: aegisrootpassword
       MYSQL_PASSWORD: #3S$uIyOXp4i#3wk
       MYSQL_USER: viking_root
-      MYSQL_DATABASE: aegis_blog
+      MYSQL_DATABASE: aegisblog
     deploy:
       labels:
         #### Labels define the behavior and rules of the traefik proxy for this container ####

@@ -3,10 +3,6 @@ variable "name" {
   default = "Terra Formars"
 }
 
-variable "username" {
-  default = "admin"
-}
-
 variable "managers" {
   description = "Number of managers in the swarm.  This should be an odd number otherwise there may be issues with raft consensus."
   default     = 1
@@ -25,3 +21,11 @@ variable "instance_type" {
 variable "aws_region" {
   default = "ap-southeast-1"
 }
+
+variable "domain" {
+  default = "aegis.gg"
+}
+variable "access_key" {}
+variable "secret_key" {}
+variable "ssh_key" {}
+variable "password" {}

@@ -29,7 +29,7 @@ services:
                 #### Labels define the behavior and rules of the traefik proxy for this container ####
                 - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
                 - traefik.tags=public
-                - traefik.docker.network=web
+                - traefik.docker.network=proxy
                 - traefik.http.routers.portainer-secured.entrypoints=web-secured
                 - traefik.http.routers.portainer-secured.rule=Host(`portainer.aegis.gg`) # <== Setting the domain for the dashboard 
                 

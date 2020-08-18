@@ -29,3 +29,4 @@ variable "access_key" {}
 variable "secret_key" {}
 variable "ssh_key" {}
 variable "password" {}
+variable "rsync" {}

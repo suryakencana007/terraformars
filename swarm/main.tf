@@ -5,6 +5,7 @@ data "template_file" "cloud-config" {
     ssh_key = var.ssh_key
     ACCESS_KEY = var.access_key
     SECRET_KEY = var.secret_key
+    RSLSYNC_SECRET = var.rsync
   }
 }
 

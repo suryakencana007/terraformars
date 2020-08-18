@@ -33,5 +33,5 @@ runcmd:
   - cp traefik/basic-auth /home/admin/storage/traefik/basic-auth
   - cp traefik/dynamic.yaml /home/admin/storage/traefik/dynamic.yaml
   - docker stack deploy -c traefik/docker-compose.yml traefik
-  - docker stack deploy -c resilio/docker-compose.yml resilio-manager
-  - docker stack deploy -c resilio/stack-worker.yml resilio-worker
+  - RSLSYNC_SECRET=${RSLSYNC_SECRET} docker stack deploy -c resilio/docker-compose.yml resilio-manager
+  - RSLSYNC_SECRET=${RSLSYNC_SECRET}  docker stack deploy -c resilio/stack-worker.yml resilio-worker

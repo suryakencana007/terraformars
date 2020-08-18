@@ -26,13 +26,13 @@ services:
         - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
         - traefik.tags=public
         - traefik.docker.network=proxy
-        - traefik.http.routers.minio-west-secured.entrypoints=web-secured
-        - traefik.http.routers.minio-west-secured.rule=Host(`cdn.aegis.gg`) # <== Setting the domain for the dashboard 
+        - traefik.http.routers.minio-secured.entrypoints=web-secured
+        - traefik.http.routers.minio-secured.rule=Host(`cdn.aegis.gg`) # <== Setting the domain for the dashboard 
         
-        - traefik.http.routers.minio-west-secured.tls=true
-        - traefik.http.routers.minio-west-secured.tls.certresolver=mytlschallenge
+        - traefik.http.routers.minio-secured.tls=true
+        - traefik.http.routers.minio-secured.tls.certresolver=mytlschallenge
                    
-        - traefik.http.services.minio-west.loadbalancer.server.port=9000
+        - traefik.http.services.minio.loadbalancer.server.port=9000
       placement:
         constraints:
          - node.role == worker

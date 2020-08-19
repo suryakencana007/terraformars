@@ -23,7 +23,7 @@ variable "aws_region" {
 }
 
 variable "domain" {
-  default = "staging.aegis.gg"
+  default = "-staging.aegis.gg"
 }
 
 variable "access_key" {}

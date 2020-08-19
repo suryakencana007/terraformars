@@ -24,13 +24,13 @@ runcmd:
   - mkdir -p /run/swarm
   - git clone https://github.com/suryakencana007/swarmprom.git /run/swarm/swarmprom
   - cd /run/swarm/swarmprom
-  - export HOST=${domain} docker stack deploy -c docker-compose-traefik.yml mon
+  - HOST="${domain}" docker stack deploy -c docker-compose-traefik.yml mon
   - cd ..
   - git clone https://github.com/suryakencana007/terraformars.git
   - cd terraformars
-  - export HOST=${domain} docker stack deploy -c portainers/docker-compose.yaml portainers
+  - HOST="${domain}" docker stack deploy -c portainers/docker-compose.yaml portainers
   - cp traefik/basic-auth /home/admin/storage/traefik/basic-auth
   - cp traefik/dynamic.yaml /home/admin/storage/traefik/dynamic.yaml
-  - export HOST=${domain} docker stack deploy -c traefik/docker-compose.yml traefik
+  - HOST="${domain}" docker stack deploy -c traefik/docker-compose.yml traefik
   - RSLSYNC_SECRET=${RSLSYNC_SECRET} docker stack deploy -c resilio/docker-compose.yml resilio-manager
   - RSLSYNC_SECRET=${RSLSYNC_SECRET}  docker stack deploy -c resilio/stack-worker.yml resilio-worker

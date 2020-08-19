@@ -53,7 +53,7 @@ services:
           - traefik.enable=true # <== Enable traefik on itself to view dashboard and assign subdomain to view it
           - traefik.tags=public
           - traefik.docker.network=proxy
-          - traefik.http.routers.traefik.rule=Host(`monitor.${HOST}`)
+          - traefik.http.routers.traefik.rule=Host(`monitor${HOST}`)
           - traefik.http.routers.traefik.tls=true
           - traefik.http.routers.traefik.tls.certresolver=mytlschallenge 
         

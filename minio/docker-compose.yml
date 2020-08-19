@@ -27,7 +27,7 @@ services:
         - traefik.tags=public
         - traefik.docker.network=proxy
         - traefik.http.routers.minio-secured.entrypoints=web-secured
-        - traefik.http.routers.minio-secured.rule=Host(`cdn.aegis.gg`) # <== Setting the domain for the dashboard 
+        - traefik.http.routers.minio-secured.rule=Host(`cdn.${HOST}`) # <== Setting the domain for the dashboard 
         
         - traefik.http.routers.minio-secured.tls=true
         - traefik.http.routers.minio-secured.tls.certresolver=mytlschallenge

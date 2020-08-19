@@ -3,7 +3,7 @@ services:
   node:
     image: devmtl/resilio:2.7.1
     environment:
-      RSLSYNC_SECRET: AOAY73WGERIAAH5RPN6TAUDMPDCZLSKQF
+      - RSLSYNC_SECRET=${RSLSYNC_SECRET}
     ports:
      - 33331:33333
     volumes:

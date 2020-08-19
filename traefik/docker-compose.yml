@@ -6,7 +6,6 @@ services:
   ###############################################
   traefik:
     image: traefik:v2.2
-    restart: always
     networks:
      - proxy
     ports:

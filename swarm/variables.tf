@@ -1,7 +1,4 @@
-variable "name" {
-  description = "Giant mutated humanoid cockroaches with incredible physical strength"
-  default = "Terra Formars"
-}
+variable "name" {}
 
 variable "managers" {
   description = "Number of managers in the swarm.  This should be an odd number otherwise there may be issues with raft consensus."

@@ -18,6 +18,7 @@ runcmd:
   - sudo yum install git -y
   - mkdir -p /home/admin/{storage/traefik/letsencrypt,data}
   - chmod -R 0600  /home/admin/storage/traefik
+  - chmod -R 0600  /home/admin/data
   - docker network create -d overlay proxy
   - echo "${ACCESS_KEY}" | docker secret create access_key -
   - echo "${SECRET_KEY}" | docker secret create secret_key -
@@ -32,5 +33,7 @@ runcmd:
   - cp traefik/basic-auth /home/admin/storage/traefik/basic-auth
   - cp traefik/dynamic.yaml /home/admin/storage/traefik/dynamic.yaml
   - HOST="${domain}" docker stack deploy -c traefik/docker-compose.yml traefik
-  - RSLSYNC_SECRET=${RSLSYNC_SECRET} docker stack deploy -c resilio/docker-compose.yml resilio-manager
-  - RSLSYNC_SECRET=${RSLSYNC_SECRET}  docker stack deploy -c resilio/stack-worker.yml resilio-worker
+  - RSLSYNC_SECRET=${RSLSYNC_STORAGE_SECRET} docker stack deploy -c resilio/stack-storage-manager.yml resilio-storage-manager
+  - RSLSYNC_SECRET=${RSLSYNC_STORAGE_SECRET}  docker stack deploy -c resilio/stack-storage-worker.yml resilio-storage-worker
+  - RSLSYNC_SECRET=${RSLSYNC_DATA_SECRET}  docker stack deploy -c resilio/stack-data-manager.yml resilio-data-manager
+  - RSLSYNC_SECRET=${RSLSYNC_DATA_SECRET}  docker stack deploy -c resilio/stack-data-worker.yml resilio-data-worker

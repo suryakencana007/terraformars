@@ -1,0 +1,31 @@
+version: '3.3'
+services:
+  node:
+    image: devmtl/resilio:2.7.1
+    environment:
+      - RSLSYNC_SECRET=${RSLSYNC_DATA_SECRET}
+    ports:
+     - 33333
+    volumes:
+     - /home/admin/data:/data
+    networks:
+     - proxy
+    logging:
+      driver: json-file
+    deploy:
+      mode: global
+      restart_policy:
+        max_attempts: 20
+      placement:
+        constraints:
+         - node.role == worker
+      resources:
+        reservations:
+          memory: 192M
+        limits:
+          cpus: '0.333'
+          memory: 512M
+
+networks:
+  proxy:
+    external: true
